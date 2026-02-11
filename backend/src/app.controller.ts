@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { AppService } from './app.service';
-import { OmdbService } from './services/ombd.services';
+import { OmdbService } from './services/omdb.service';
 
 @Controller()
 export class AppController {
