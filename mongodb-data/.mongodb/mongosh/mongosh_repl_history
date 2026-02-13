@@ -1,2 +1,4 @@
+db.cacheentries.find().pretty()
+show collections
 exit
 show dbs

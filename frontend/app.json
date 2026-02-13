@@ -25,6 +25,13 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+
+    "packs": {
+      "proxy": {
+        "/api": "http://localhost:3000"
+      }
     }
+
   }
 }
