@@ -21,10 +21,10 @@ export class OmdbService {
     async searchMovies(query: string): Promise<any> {
         const cached = await this.cacheService.getCached(query);
         if (cached) {
-            console.log('Cache HIT for "${query}"');
+            console.log('Cache HIT for', query);
             return cached.data;
         }
-        console.log('Cache MISS for "${query}" -> now calling OMDB');
+        console.log(`Cache MISS for "${query}" -> now calling OMDB`);
         const omdbResponse = await firstValueFrom(
             this.httpService.get(this.omdbUrl, {
             params: { s: query, apiKey: this.apiKey },

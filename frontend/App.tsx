@@ -6,7 +6,7 @@ import { StyleSheet, Text, View, SafeAreaView, TextInput, FlatList, ActivityIndi
 interface Movie {
   imdbID: string;
   Title: string;
-  year: string;
+  Year: string;
   Poster: string;
 }
 
@@ -41,12 +41,19 @@ export default function App() {
 
 
       if (!response.ok) {
-        throw new Error('HTTP ${response.status}: ${response.statusText}');
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      const data: OmdbResponse = await response.json();
+      const json = await response.json();
+      const payload = ('data' in json && json.data) ? json.data : json;
 
-      setMovies(data.Search || []);
+      if (payload.Response === 'false') {
+        setMovies([]);
+        setError('No Movies Found');
+        return;
+      }
+
+      setMovies(payload.Search || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Network error');
       setMovies([]);
@@ -74,15 +81,19 @@ export default function App() {
   const renderMovie = useCallback(({item}: {item: Movie}) => (
     <View style={styles.movieRow}>
         <Text style={styles.title} numberOfLines={1}>{item.Title}</Text>
-        <Text style={styles.year}>{item.year}</Text>
+        <Text style={styles.year}>{item.Year}</Text>
     </View>
   ), []);
 
   const keyExtractor = useCallback((item: Movie) => item.imdbID, []);
-
+  console.log('render - movie', movies.length, 'loading:', loading)
   return ( 
     <SafeAreaView style={styles.container}>
       <Text style={styles.header}> Movie Browser </Text>
+
+      <Text style={{padding: 20}}>
+        Debug: {movies.length} movies | {loading ? 'loading...' : 'idle'}
+      </Text>
 
       <TextInput
       style={styles.input}
