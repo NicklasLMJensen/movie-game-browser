@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
-import { StyleSheet, Text, View, SafeAreaView, TextInput, FlatList, ActivityIndicator, Alert, SafeAreaViewBase  } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, TextInput, FlatList, ActivityIndicator, Alert, SafeAreaViewBase, Image  } from 'react-native';
 
 //same shape as backend response
 interface Movie {
@@ -79,9 +79,17 @@ export default function App() {
 
 
   const renderMovie = useCallback(({item}: {item: Movie}) => (
+
     <View style={styles.movieRow}>
-        <Text style={styles.title} numberOfLines={1}>{item.Title}</Text>
-        <Text style={styles.year}>{item.Year}</Text>
+        <Image
+        source={{ uri: item.Poster }}
+        style={styles.Poster}
+        />
+      
+        <View style={styles.MovieText}>
+          <Text style={styles.title} numberOfLines={2}>{item.Title}</Text>
+          <Text style={styles.year}>{item.Year}</Text>
+        </View>
     </View>
   ), []);
 
@@ -182,6 +190,31 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 3,
     elevation: 2,
+  },
+
+  MovieText: { 
+    flexDirection: 'row',
+    flex: 1,
+    alignItems: 'center',
+    paddingHorizontal: 20, 
+    paddingVertical: 15, 
+    marginHorizontal: 20, 
+    marginVertical: 5,
+    backgroundColor: '#f5f5f5', 
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+
+  Poster: {
+    width: 90,
+    height: 135,
+    borderRadius: 8,
+    marginRight: 12,
+    backgroundColor: '#ddd',
   },
   
   title: { 

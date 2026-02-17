@@ -12,7 +12,7 @@ export class CacheEntry extends Document {
     @Prop({ required: true, type: MongooseSchema.Types.Mixed })
     data: unknown;
 
-    @Prop({ required: true, expires: '24h '})
+    @Prop({ required: true, expires: '72h '})
     expiresAt: Date;
 }
 
