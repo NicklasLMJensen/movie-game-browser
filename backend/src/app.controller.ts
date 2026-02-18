@@ -10,14 +10,11 @@ export class AppController {
   ) {}
 
   @Get('/search')
-  async getSearch(@Query('q') query: string) {
+  async getSearch(@Query('q') query: string, @Query('page') page?: string,) {
     if (!query) {
       return { error: 'Query parameter "q" required' };
     }
-    const results = await this.omdbService.searchMovies(query);
-    return {
-      message: 'Found ${results.totalresults} results for "${query}"',
-      data: results,
-    };
+    const pageNum = parseInt(page || '1', 10);
+    return this.omdbService.searchMovies(query, pageNum);
   }
 }

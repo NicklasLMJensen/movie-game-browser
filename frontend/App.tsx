@@ -23,7 +23,11 @@ export default function App() {
   const [loading, setLoading] = useState<boolean>(false); //loading icon
   const [error, setError] = useState<string>(''); //error alert
 
-  const callBackend = useCallback(async (searchQuery: string ) =>{
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [loadingMore, setLoadingMore] = useState<boolean>(false);
+
+  const callBackend = useCallback(async (searchQuery: string, page: number =1 ) =>{
     //prevets empry search
     if (!searchQuery.trim()) {
       setMovies([]);
@@ -37,7 +41,7 @@ export default function App() {
 
       const BACKEND_BASE = 'http://localhost:3000';
       // nestJs backend
-      const response = await fetch(`${BACKEND_BASE}/search?q=${encodeURIComponent(searchQuery)}`);
+      const response = await fetch(`${BACKEND_BASE}/search?q=${encodeURIComponent(searchQuery)}&page=${page}`);
 
 
       if (!response.ok) {
@@ -47,13 +51,21 @@ export default function App() {
       const json = await response.json();
       const payload = ('data' in json && json.data) ? json.data : json;
 
-      if (payload.Response === 'false') {
+      if (payload.Response === 'False') {
         setMovies([]);
         setError('No Movies Found');
         return;
       }
 
-      setMovies(payload.Search || []);
+      if (page === 1) {
+        setMovies(payload.Search || []);
+      } else {
+        setMovies(prev => [...prev, ...(payload.Search || [])]);
+      }
+      if (page >= 3) {
+        setHasMore(false);
+      }
+
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Network error');
       setMovies([]);
@@ -62,6 +74,34 @@ export default function App() {
     }
   }, []);
 
+  const loadMoreMovies = useCallback (() => {
+
+    if (!hasMore) {
+      console.log('No more pages to load')
+      return;
+    }
+
+    if (loadingMore) {
+      console.log('Alreayd loaded more')
+      return;
+    }
+
+    if (currentPage >= 3) {
+      console.log('Reached max pages')
+      setHasMore(false)
+      return;
+    }
+
+    console.log(`Loading page ${currentPage + 1}`);
+    setLoadingMore(true);
+
+    const nextPage = currentPage + 1;
+
+    callBackend(query, nextPage).then(() => {
+      setCurrentPage(nextPage);
+      setLoadingMore(false);
+    });
+  }, [hasMore, loadingMore, currentPage, query, callBackend]);
 
   //skips emptry query
   useEffect(() => {
@@ -69,9 +109,13 @@ export default function App() {
       setMovies([]);
       return;
     }
+
+    setCurrentPage(1);
+    setHasMore(true);
+
     //cancels pending query
     const timer = setTimeout(() => {
-      callBackend(query);
+      callBackend(query, 1);
     }, 300);
 
     return () => clearTimeout(timer);
@@ -134,6 +178,17 @@ export default function App() {
       ListEmptyComponent={
         !loading ? (
           <Text style={styles.empty}>Enter a search term above</Text>
+        ) : null
+      }
+      onEndReached={loadMoreMovies}
+      onEndReachedThreshold={0.8}
+
+      ListFooterComponent={
+        loadingMore ? (
+          <View style={styles.loadingFooter}>
+            <ActivityIndicator size="small" color="#007AFF"/>
+            <Text style={styles.footerText}>Loading More</Text>
+          </View>
         ) : null
       }
     />
@@ -242,6 +297,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666'
   },
+
+  loadingFooter: {
+  paddingVertical: 20,
+  alignItems: 'center',
+},
+
+footerText: {
+  marginTop: 8,
+  fontSize: 14,
+  color: '#666',
+},
 
   // === ERROR STATE ===
   error: {

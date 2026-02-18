@@ -18,20 +18,27 @@ export class OmdbService {
         this.apiKey = this.configService.get('OMDB_API_KEY')!;
     }
 
-    async searchMovies(query: string): Promise<any> {
-        const cached = await this.cacheService.getCached(query);
+    async searchMovies(query: string, page: number =1): Promise<any> {
+        const cacheKey = `${query}_page${page}`;
+
+        const cached = await this.cacheService.getCached(cacheKey);
         if (cached) {
-            console.log('Cache HIT for', query);
+            console.log(`Cache HIT for ${cacheKey}`);
             return cached.data;
         }
-        console.log(`Cache MISS for "${query}" -> now calling OMDB`);
+
+        console.log(`Cache MISS for "${cacheKey}" -> now calling OMDB`);
         const omdbResponse = await firstValueFrom(
             this.httpService.get(this.omdbUrl, {
-            params: { s: query, apiKey: this.apiKey },
+                params: {
+                    s: query,
+                    page: page,
+                    apiKey: this.apiKey
+                },
             }),
         );
-        await this.cacheService.setCache(query, omdbResponse.data)
 
+        await this.cacheService.setCache(cacheKey, omdbResponse.data);
         return omdbResponse.data;
     }
 }
