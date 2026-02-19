@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, Param } from '@nestjs/common';
 import { AppService } from './app.service';
 import { OmdbService } from './services/omdb.service';
 
@@ -16,5 +16,10 @@ export class AppController {
     }
     const pageNum = parseInt(page || '1', 10);
     return this.omdbService.searchMovies(query, pageNum);
+  }
+
+  @Get(`movie/:imdbID`)
+  getMovieById(@Param(`imdbID`) imdbID: string) {
+    return this.omdbService.getMovieById(imdbID);
   }
 }

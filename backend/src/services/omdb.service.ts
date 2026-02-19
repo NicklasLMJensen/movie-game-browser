@@ -41,4 +41,30 @@ export class OmdbService {
         await this.cacheService.setCache(cacheKey, omdbResponse.data);
         return omdbResponse.data;
     }
+
+
+
+    async getMovieById(imdbID: string): Promise<any> {
+        const cacheKey = `details_${imdbID}`;
+
+        const cached = await this.cacheService.getCached(cacheKey);
+        if (cached) {
+            console.log(`cache HIT for details ${imdbID}`);
+            return cached.data;
+        } 
+
+        console.log(`Cache MISS for details ${imdbID}`);
+        const response = await firstValueFrom(
+            this.httpService.get(this.omdbUrl, {
+                params: {
+                    i: imdbID,
+                    plot: `full`,
+                    apiKey: this.apiKey
+                },
+            }),
+        );
+
+        await this.cacheService.setCache(cacheKey, response.data);
+        return response.data;
+    }
 }
