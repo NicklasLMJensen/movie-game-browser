@@ -19,7 +19,7 @@ export class CacheService {
     }
 
     async setCache(query: string, data: any): Promise<CacheEntry> {
-        const expiresAt = new Date(Date.now() +  3 * 24 * 60 * 60 * 1000);
+        const expiresAt = new Date(Date.now() +  7 * 24 * 60 * 60 * 1000);
         return await this.cacheModel.create({
             query,
             data,

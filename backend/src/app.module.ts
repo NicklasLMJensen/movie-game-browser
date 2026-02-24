@@ -7,6 +7,7 @@ import { OmdbService } from './services/omdb.service';
 import { CacheService } from './services/cache.service';
 import { CacheModule } from './models/cache.module';
 import { MongooseModule } from '@nestjs/mongoose';
+import { WatchlistModule } from './models/watchlist.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { MongooseModule } from '@nestjs/mongoose';
     HttpModule,
     MongooseModule.forRoot(process.env.MONGODB_URI as string),
     CacheModule,
+    WatchlistModule,
   ],
   controllers: [AppController],
   providers: [AppService, OmdbService, CacheService],

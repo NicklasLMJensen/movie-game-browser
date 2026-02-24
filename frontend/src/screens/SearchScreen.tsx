@@ -186,11 +186,11 @@ export default function SearchScreen({ navigation }: Props) {
       showsVerticalScrollIndicator={false}
       ListEmptyComponent={
         !loading ? (
-          <Text style={styles.empty}>Enter a search term above</Text>
+          <Text style={styles.empty}></Text>
         ) : null
       }
       onEndReached={loadMoreMovies}
-      onEndReachedThreshold={0.8}
+      onEndReachedThreshold={1}
 
       ListFooterComponent={
         loadingMore ? (
